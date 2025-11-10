@@ -4,6 +4,22 @@
 @import "{{ site.theme }}";
 
 hr {
-  margin-top: 5px;
-  margin-bottom: 20px;
+  margin: 0px 0px 0px 0px;
 }
+
+header {
+}
+
+.inner {
+  width: 700px;
+  margin: 0 auto;
+}
+
+h2 {
+  margin-top: 4px;
+  margin-bottom: 8px;
+  font-size: 24px;
+  font-weight: normal;
+  color: #000000;
+}
+

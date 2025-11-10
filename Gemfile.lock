@@ -277,6 +277,7 @@ PLATFORMS
 
 DEPENDENCIES
   github-pages
+  jekyll-titles-from-headings
   openssl
   webrick (~> 1.9)
 

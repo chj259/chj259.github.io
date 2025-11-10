@@ -1,0 +1,17 @@
+---
+title: Post Archive
+permalink: /archive/
+---
+<h1 style="color:Black;"> {{ page.title | escape }}</h1>
+<div>
+{% for tag in site.tags %}
+<h2 style="color:FireBrick;">{{ tag[0] }}</h2>
+<ul>
+{% for post in tag[1] %}
+<li>
+<a href= "{{ post.url }}"> {{ post.date | date: "%B %Y" }} - {{ post.title }}</a>
+</li>
+{% endfor %}
+</ul>
+{% endfor %}
+</div>

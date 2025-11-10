@@ -1,4 +1,4 @@
-**Welcome to the blog!**
+## Welcome to the blog!
 
 I mainly cover cybersecurity topics, particularly web security. I like video games too, though. There might be some stuff on Godot or Unity if I feel like it.
 <!--
