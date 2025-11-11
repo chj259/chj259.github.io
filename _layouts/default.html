@@ -19,8 +19,17 @@
       <div class="inner">
 
         <header>
-          <h1 style="color:FireBrick;">EtruscanBoar's Notes</h1>
-          <h2>{{ page.description | default: site.description | default: site.github.project_tagline }}</h2>
+ 	 <div class="site_navi">
+          <h1 class="left" style="color:FireBrick;">
+	  <a href="/">EtruscanBoar's Notes</a> 
+	  </h1>
+	  <nav class="right">
+	  <a href="/archive">Post Archive</a>
+	  </nav>
+	 </div>
+	 <h2>
+         {{ page.description | default: site.description | default: site.github.project_tagline }}
+	 </h2>
         </header>
         <!-- <section id="downloads" class="clearfix">
           {% if site.show_downloads %}
@@ -37,7 +46,9 @@
         </section>
         <hr>
         <section id="main_content">
-          {{ content }}
+          <div class="wrapper">
+	    {{ content }}
+	  </div>
         </section>
 
         <footer>
