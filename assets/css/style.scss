@@ -40,7 +40,7 @@ h2 {
   margin-top: 4px;
   margin-bottom: 8px;
   font-size: 24px;
-  font-weight: normal;
+  font-: normal;
   color: #000000;
 }
 footer {
@@ -51,4 +51,30 @@ footer {
   color: #aaa;
   background: transparent url('../images/hr.png') 50% 0 no-repeat;
 }
+ol, ul {
+  font-family: 'Helvetica Neue', Helvetica, Arial, serif;
+  font-weight: 300;
+  list-style-position: inside;
+  padding-left: 20px;
+  margin-bottom: 5px;
+}
 
+ul {
+  list-style-type: none;
+  margin-top: 5px;
+}
+
+ol li::marker {
+  color: firebrick;
+  font-size: 1em;
+}
+
+ul li::marker {
+  content: "• ";
+  color: gray; 
+  font-size: 1em;
+}
+
+b, strong {
+   color: firebrick;
+}
