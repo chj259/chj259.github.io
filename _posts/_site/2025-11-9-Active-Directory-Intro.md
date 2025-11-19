@@ -1,3 +1,4 @@
+**
 ---
 title: Introduction to Active Directory
 tags: Other 
@@ -44,61 +45,51 @@ AD is the directory service for Windows. It follows a sort of graph-like **fores
 25. **NTDS.DIT**: the heart of AD, stores all password hashes in domain, or even just cleartext
 
 ## Common Objects
+
 ### Users
 
 Leaf objects, considered security principals. Even low privileged users can access much of the environment and enumerate the entire domain/forest
+
 ### Contacts
 
 Leaf objects, but NOT security principals. They contain contact info for external users
+
 ### Printers
 
 Leaf objects and not security principals
+
 ### Computers
 
 Leaf objects, security principals, very important targets similar to users. Use NT AUTHORITY\SYSTEM account to gain access and perform enumerations
+
 ### Shared Folders
 
 Points to the folder on the specific computer where it resides. Follows certain access control rules.
+
 ### Groups
 
 Container object that is a security principal. Helps sort objects by roles, departments, etc. However, nested group membership usually leads to vulnerabilities. Manages *permissions*.
+
 ### Organizational Units
 
 Container that stores similar objects. It's sort of like a mix between a class and a container, if you set certain attributes on the OU object it gives those permissions to all objects within the OU. Manages *settings*.
+
 ### Domain
 
 A tree of objects, basically. All domains have policies, some are manual and some are automatically configured
+
 ### Domain Controllers
 
 The brains of AD, they handle authentication, authorization, and access, also enforces security policies(e.g. SDProp) and stores information about domain
+
 ### Sites
 
 Set of computers connected across subnets, they are used to help replication across DCs
+
 ### Built-in
 
 Container that holds default groups
+
 ### Foreign Security Principals
 
 Security Principals from trusted external forests, added whenever such an object is added to the current domain. It's more like a pointer to the actual object in the external forest. They're all put into a specific container called ForeignSecurityPrincipals
-
-## Active Directory Functionality
-
-### FMSO Roles
-There are 5 of these, as follows:
-1. **Schema Master**: Read/write to AD schema, which means control of which objects and attributes exist
-2. **Domain Naming Master**: Manage domain names, ensure no two domains have the same name
-3. **RID Master**: Assigns RIDs for new objects in domains and assigns blocks of RIDs to DCs, also makes sure that SIDs are unique
-4. **PDC Emulator**: The authoritative DC in the domain, in charge of auth requests, password changes, and GPOs. Also maintains time?
-5. **Infrastructure Master**: Translates GUIDs, SIDs, DNs between domains, helps for communication between multiple domains in the same forest
-
-### Trusts
-
-The possible kinds of trusts are parent-child, cross-link, external, tree-root, and forest. Trusts can be transitive (if A trusts B and B trusts C, then A trusts C) or non-transitive, as well as two-way or one-way. 
-
-1. **Parent-Child**: Two-way transitive trust with parent domain
-2. **Cross-link**: Between two child domains for fast auth
-3. **External**: Non-transitive trust between two domains in separate forests that don't already trust each other
-4. **Tree-root**: Between root and the newest domain in the tree, usually for when you've just set up a new domain
-5. **Forest**: Transitive trust between two forest roots
-
-Usually, trusts are a target because they're set up improperly. For example, mergers and acquisitions can create unsafe bidirectional trusts between the two companies' domains.   
