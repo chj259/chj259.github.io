@@ -1,0 +1,127 @@
+<h2 id="active-directory-structure">Active Directory Structure</h2>
+
+<p>AD is the directory service for Windows. It follows a sort of graph-like <strong>forest</strong> structure, each tree is a <strong>domain</strong>, subgraphs are subdomains. Vertices are <strong>objects</strong> (GPOs, OUs, DCs, Users, Groups, Computers, etc.)</p>
+
+<h2 id="active-directory-vocab">Active Directory Vocab</h2>
+
+<ol>
+  <li><strong>Objects</strong>: basic “unit” of resource in AD</li>
+  <li><strong>Attributes</strong>: characteristics of object e.g. hostname, DNS; think metadata
+    <ul>
+      <li>Each attribute has associated LDAP name for querying.</li>
+    </ul>
+  </li>
+  <li><strong>Schema</strong>: blueprint of environment, defines objects &amp; attributes in forest
+    <ul>
+      <li>This is where classes are defined (very object oriented)</li>
+    </ul>
+  </li>
+  <li><strong>Domain</strong>: tree, not necessarily maximal</li>
+  <li><strong>Tree</strong>: the spanning tree</li>
+  <li><strong>Leaf</strong>: objects with no children</li>
+  <li><strong>Container</strong>: objects whose goal is to store others</li>
+  <li><strong>GUID</strong>: unique ID for every user &amp; group, stored in objectGUID attribute; think MAC address</li>
+  <li><strong>Security Principals</strong>: Either objects that should be authenticated, or the objects that do the authenticatine
+    <ul>
+      <li>DIFFERENT from local auth, e.g. SAM, this is domain auth</li>
+    </ul>
+  </li>
+  <li><strong>SID</strong>: unique ID for security principals and groups
+    <ul>
+      <li>there are some default SIDs, e.g. Guest, Everyone</li>
+      <li>login process uses SID in auth token that contains it, as well as associated access levels</li>
+    </ul>
+  </li>
+  <li><strong>Distinguished Name (DN)</strong>: full path from root to object</li>
+  <li><strong>RDN</strong>: subset of DN, two objects in same container can’t have the same RDN</li>
+  <li><strong>First Single Master Operation (FSMO)</strong>: system for assigning abilities to DCs, designed to improve consistency between DCs while preventing everything from being assigned to a single DC. first DC in root of forest gets all 5 permissions, subsequent DCs only get 3. this can be reconfigured by admins</li>
+  <li><strong>Global Catalog</strong>: DC that archives all objects in forest, even those not in its domain
+    <ul>
+      <li>for auth &amp; object searching</li>
+    </ul>
+  </li>
+  <li><strong>Read-Only DC</strong>: reduces replication traffic and contains modifications by SYSVOL</li>
+  <li><strong>Replication</strong>: objects copied between DCs, KCC makes sure changes are synchronized between DCs</li>
+  <li><strong>GPO</strong>: the rules and settings, they also have GUID</li>
+  <li><strong>SACL</strong>: Sometimes access will be logged, these permissions are controlled by SACL</li>
+  <li><strong>Tombstone</strong>: contains deleted object, unlike recycle bin, removes all attributes</li>
+  <li><strong>Recycle Bin</strong>: Mostly preserves attributes</li>
+  <li><a href="https://learn.microsoft.com/en-us/archive/technet-wiki/24160.active-directory-back-to-basics-sysvol"><strong>SYSVOL</strong></a>: Folder on every DC, stores public files that outside DCs should have access to, particularly all GPOs, some task scripts</li>
+  <li><strong>Admin SD Holder</strong>: Security principal for admins
+    <ul>
+      <li>SDPropagator restores ACL by comparing permissions with AdminSDHolder, check happens regularly to prevent persistence</li>
+      <li>side effect is that accounts with adminCount=1 attribute (SDProp protected) usually means they’re higher value and become targets</li>
+    </ul>
+  </li>
+  <li><strong>dsHeuristics</strong>: attribute describing config settings forest-wide
+    <ul>
+      <li>interaction with SDProp - removes built-in groups from being touched by AdminSDHolder</li>
+    </ul>
+  </li>
+  <li><strong>sIDHistory</strong>: attribute recording all previous SIDs, could be dangerous if misconfigured</li>
+  <li><strong>NTDS.DIT</strong>: the heart of AD, stores all password hashes in domain, or even just cleartext</li>
+</ol>
+
+<h2 id="common-objects">Common Objects</h2>
+<h3 id="users">Users</h3>
+
+<p>Leaf objects, considered security principals. Even low privileged users can access much of the environment and enumerate the entire domain/forest</p>
+<h3 id="contacts">Contacts</h3>
+
+<p>Leaf objects, but NOT security principals. They contain contact info for external users</p>
+<h3 id="printers">Printers</h3>
+
+<p>Leaf objects and not security principals</p>
+<h3 id="computers">Computers</h3>
+
+<p>Leaf objects, security principals, very important targets similar to users. Use NT AUTHORITY\SYSTEM account to gain access and perform enumerations</p>
+<h3 id="shared-folders">Shared Folders</h3>
+
+<p>Points to the folder on the specific computer where it resides. Follows certain access control rules.</p>
+<h3 id="groups">Groups</h3>
+
+<p>Container object that is a security principal. Helps sort objects by roles, departments, etc. However, nested group membership usually leads to vulnerabilities. Manages <em>permissions</em>.</p>
+<h3 id="organizational-units">Organizational Units</h3>
+
+<p>Container that stores similar objects. It’s sort of like a mix between a class and a container, if you set certain attributes on the OU object it gives those permissions to all objects within the OU. Manages <em>settings</em>.</p>
+<h3 id="domain">Domain</h3>
+
+<p>A tree of objects, basically. All domains have policies, some are manual and some are automatically configured</p>
+<h3 id="domain-controllers">Domain Controllers</h3>
+
+<p>The brains of AD, they handle authentication, authorization, and access, also enforces security policies(e.g. SDProp) and stores information about domain</p>
+<h3 id="sites">Sites</h3>
+
+<p>Set of computers connected across subnets, they are used to help replication across DCs</p>
+<h3 id="built-in">Built-in</h3>
+
+<p>Container that holds default groups</p>
+<h3 id="foreign-security-principals">Foreign Security Principals</h3>
+
+<p>Security Principals from trusted external forests, added whenever such an object is added to the current domain. It’s more like a pointer to the actual object in the external forest. They’re all put into a specific container called ForeignSecurityPrincipals</p>
+
+<h2 id="active-directory-functionality">Active Directory Functionality</h2>
+
+<h3 id="fmso-roles">FMSO Roles</h3>
+<p>There are 5 of these, as follows:</p>
+<ol>
+  <li><strong>Schema Master</strong>: Read/write to AD schema, which means control of which objects and attributes exist</li>
+  <li><strong>Domain Naming Master</strong>: Manage domain names, ensure no two domains have the same name</li>
+  <li><strong>RID Master</strong>: Assigns RIDs for new objects in domains and assigns blocks of RIDs to DCs, also makes sure that SIDs are unique</li>
+  <li><strong>PDC Emulator</strong>: The authoritative DC in the domain, in charge of auth requests, password changes, and GPOs. Also maintains time?</li>
+  <li><strong>Infrastructure Master</strong>: Translates GUIDs, SIDs, DNs between domains, helps for communication between multiple domains in the same forest</li>
+</ol>
+
+<h3 id="trusts">Trusts</h3>
+
+<p>The possible kinds of trusts are parent-child, cross-link, external, tree-root, and forest. Trusts can be transitive (if A trusts B and B trusts C, then A trusts C) or non-transitive, as well as two-way or one-way.</p>
+
+<ol>
+  <li><strong>Parent-Child</strong>: Two-way transitive trust with parent domain</li>
+  <li><strong>Cross-link</strong>: Between two child domains for fast auth</li>
+  <li><strong>External</strong>: Non-transitive trust between two domains in separate forests that don’t already trust each other</li>
+  <li><strong>Tree-root</strong>: Between root and the newest domain in the tree, usually for when you’ve just set up a new domain</li>
+  <li><strong>Forest</strong>: Transitive trust between two forest roots</li>
+</ol>
+
+<p>Usually, trusts are a target because they’re set up improperly. For example, mergers and acquisitions can create unsafe bidirectional trusts between the two companies’ domains.</p>

@@ -1,0 +1,70 @@
+<h2 id="kerberos">Kerberos</h2>
+
+<p>The default EAP for Windows since 2000. Distributes one-time tickets to authenticate users, and is stateless.</p>
+
+<p>Remember that domain controllers handle authentication. Each DC has a <strong>Key Distribution Center (KDC)</strong> that recieves requests from users when they login. The request is encrypted by user’s password, and if successfully decrypted, grants <strong>Ticket Granting Ticket</strong> to user.</p>
+
+<p>User shows TGT to a DC in order to gain access to services (TGS ticket). They present this ticket to the service or application to gain entry.</p>
+
+<p>System ensures that  <em>passwords are never sent over the network.</em></p>
+
+<p>Kerberos is TCP/UDP port 88.</p>
+
+<h2 id="ldap">LDAP</h2>
+
+<p>Directory lookup protocol (latest specification <a href="https://datatracker.ietf.org/doc/html/rfc4511">here</a>). How applications communicate with serves, similarly to how HTML allows web to communicate wtih a web server–Active Directory is a directory server that uses LDAP protocol.</p>
+
+<p>Connect to a <strong>Directory System Agent</strong>, which is the LDAP server and converts requests to LDAP queries. LDAP is 389 and LDAPS is 636.</p>
+
+<h2 id="ldap-authentication">LDAP Authentication</h2>
+
+<ol>
+  <li><strong>Simple Authentication</strong>: provide a username and password to authenticate. Includes anonymous auth, unauthenticated auth, and username/password auth.</li>
+  <li><strong>SASL Authentication</strong>: Uses Simple Authentication and Security Layer framework for authentication.</li>
+</ol>
+
+<p>Authentication credentials are set per each session using BIND operation. All of these messages are unencrypted by default, so it’s recommended to turn on TLS encryption.</p>
+
+<h2 id="msrpc">MSRPC</h2>
+
+<p>Window’s remote protocol, allows one host to execute programs on another host. There are 4 different RPC interfaces:</p>
+
+<ol>
+  <li><strong>lsaprc</strong>: Handles calls to Local Security Authority(LSA), which manages local security policy, audit policy, and auth services. Usually for changing domain security policy.</li>
+  <li><strong>netlogon</strong>: Authenticate users and services in domain.</li>
+  <li><strong>samr</strong>: Remote SAM manages domain account database, e.g. users, groups, computers and other security principals. This info is usually available to all authenticated domain users, which allows tools like Bloodhound to map out domain trees. This can be mitigated by only allowing admins to make samr queries.</li>
+  <li><strong>drsuapi</strong>: Directory Replication Service Remote Protocol, handles replication between remote DCs. Be careful that it doesn’t replicate an important file!</li>
+</ol>
+
+<h2 id="ntlm">NTLM</h2>
+
+<p>This is a hashing protocol used to store sensitive info, used in common AD auth protocols like <strong>NTLMv1</strong> and <strong>NTLMv2</strong>.</p>
+
+<h3 id="lan-manager-lm">LAN Manager (LM)</h3>
+
+<p>Oldest and worst hash type, uses MAXIMUM of 14 characters split into two seven-character chunks, NOT CASE SENSITIVE. If password is shorter than 14 chars, it’s padded with NULLs.</p>
+
+<ol>
+  <li>Split password into seven-character chunks</li>
+  <li>On each chunk, use DES to encrypt chunk with string KGS!@#$%</li>
+  <li>Concatenate the chunks together, crating LM hash</li>
+</ol>
+
+<h3 id="nt-lan-manager-ntlm">NT LAN Manager (NTLM)</h3>
+
+<p>Challenge-response protocol that builds on previous LM hash as well as a new NT hash.</p>
+<ol>
+  <li>NEGOTIATE_MESSAGE: the “SYN”</li>
+  <li>CHALLENGE_MESSAGE: Checking authentication</li>
+  <li>AUTHENTICATE_MESSAGE: the “SYN-ACK”. Store the NT and LM password hash in SAM database or NTDS.DIT database</li>
+</ol>
+
+<h3 id="ntlmv2">NTLMv2</h3>
+<p>New and improved NTLM that has a more detailed challenge response mechanism. Uses MD5 and sense two responses instead of just one.</p>
+
+<h3 id="mscache2">MSCache2</h3>
+
+<p>Auth protocol that can be used when DCs are unavailable. Also known as Domain Cached Credentials (DCC).</p>
+
+<p>Hosts save the last ten hashes for users that logged in at <strong>HKEY_LOCAL_MACHINE\SECURITY\Cache</strong> and use these for authentication. Users logged on this way can’t access any services that require DC auth. Also, hashes acquired from MSCache2 can’t be used for pass-the-hash attacks and are hard to crack.</p>
+

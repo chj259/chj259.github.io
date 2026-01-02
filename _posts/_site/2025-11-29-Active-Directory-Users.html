@@ -1,0 +1,36 @@
+<p>Gives “identity” to a person or computer, allowing for more efficent access management through use of groups.</p>
+
+<p>Some users may have multiple accounts for different roles, and there are often also disabled users from former employees, temps, interns, etc. that are being saved for audit purposes and put in the “former employees” OU.</p>
+
+<h2 id="local-accounts">Local Accounts</h2>
+
+<p>Scope is limited to a single server/workstation, so permissions only apply to that single host and not to the wider domain.</p>
+
+<ul>
+  <li><strong>Administrator</strong>: the first account created on the system, it has full access to all resources and cannot be deleted or locked. However, it can be disabled/renamed.</li>
+  <li><strong>Guest</strong>: Disabled by default, a bad idea to re-enable because it allows unauthenticated access to the host</li>
+  <li><strong>SYSTEM</strong>: Default account used by Windows OS to perform certain processes. Has highest level permission. Can’t be altered in User Manager/put in a group.</li>
+  <li><strong>Network Service</strong>: Account used for remote services.</li>
+  <li><strong>Local Service</strong>: Account used for running local services, the name doesn’t lie.</li>
+</ul>
+
+<h2 id="domain-users">Domain Users</h2>
+
+<p>Unlike local users, their scope is the entire domain.</p>
+
+<p>Important Account: <strong>KRBTGT</strong> account distributes TGTs for various domain resources, if an attacker has this account they can basically grant themselves access</p>
+
+<h2 id="user-naming-attributes">User Naming Attributes</h2>
+
+<p>Remember what these are: UPN, ObjectGUID, SAMAccountName, objectSID, sIDHistory</p>
+
+<h2 id="domain-joined-and-non-domain-joined">Domain-joined and Non-Domain-joined</h2>
+
+<h3 id="domain-joined">Domain-joined</h3>
+
+<p>The classic AD model using domain controller as central “brain” and storage, access is determined by DC, devices don’t communicate directly with each other.</p>
+
+<h3 id="non-domain-joined">Non-domain joined</h3>
+
+<p>Also known as a <strong>workgroup</strong>, devices don’t usually have a DC and are P2P connected to each other. Each host determines access itself and there’s not really any concept of a “group”.</p>
+
