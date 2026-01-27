@@ -1,1 +1,22 @@
+<p>AD has the same security tricks as usual, like password rotation using Local Administrator Password Solution (LAPS), setting up logging and monitoring, RBAC with Group Policy Objects. Special care should be given for <strong>group managed service accounts (gMSA)</strong>, which manage services that require credentials, <strong>Domain Admins</strong>, which have full control over the entire domain, and the rights for <strong>Local Admin</strong> as well as <strong>RDP</strong>.</p>
 
+<h2 id="group-policy">Group Policy</h2>
+
+<p>GPOS are applied in the following order from first to last, with overlapping policies getting overwritten.</p>
+
+<ol>
+  <li><strong>Local Group Policy:</strong> Defined by host locally</li>
+  <li><strong>Site Policy:</strong> Policies specifically for the Enterprise Site of the host</li>
+  <li><strong>Domain-wide Policy:</strong> Defined by domain</li>
+  <li><strong>Organizational Unit:</strong> Defined by organizational unit</li>
+</ol>
+
+<p>Policies in OUs are applied from parent to child, so policies in leafs like users and computers overwrite higher level OUs. Within an object, policies with higher link orders are applied first. However, by specifying the <strong>Enforced</strong> option, a GPO cannot be overwritten. The option <strong>Block inheritance</strong> will prevent policies from higher levels from being applied to the OU.</p>
+
+<h2 id="gpo-vulnerabilities">GPO Vulnerabilities</h2>
+
+<p>Make sure users only have the rights and privileges they need. Otherwise they can do all sorts of malicious things to your AD, like adding additional rights, scheduling malicious tasks, adding admins, etc.</p>
+
+<p><img src="/assets/img/bh_gpo.png" alt="Bloodhound Example" /></p>
+
+<p>We can identify possible attack paths using [Bloodhound] (https://bloodhound.specterops.io/get-started/introduction) as shown below. Here, <strong>Domain Users</strong> can modify <strong>Disconnect Idle RDP</strong> GPO because they are part of <strong>Authenticated Users</strong>.</p>

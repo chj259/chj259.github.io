@@ -3,6 +3,10 @@
 
 @import "{{ site.theme }}";
 
+#container, body {
+ background: GhostWhite
+}
+
 hr {
   background: transparent url('../images/hr.png') 50% 0 no-repeat;
 }
@@ -35,12 +39,15 @@ header {
 .left {
   flex: 1;
 }
-
+h1 {
+  font-family: 'Montserrat', Helvetica, serif;
+  color: #000000;
+  font-weight: bold;
+}
 h2 {
   margin-top: 4px;
   margin-bottom: 8px;
   font-size: 24px;
-  font-: normal;
   color: #000000;
 }
 footer {
@@ -64,19 +71,16 @@ ul {
   margin-top: 5px;
 }
 
-ol li::marker {
+ol > li::marker {
   color: firebrick;
   font-size: 1em;
+  font-weight: bold;
 }
 
 ul > li::marker {
   content: "• ";
   color: gray; 
   font-size: 1em;
-}
-
-ol > li::marker {
-  font-weight: bold;
 }
 
 b, strong {

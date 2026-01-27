@@ -1,0 +1,33 @@
+<p>This chapter goes through four different categories of opponents: the state, criminals, geeks, and the swamp. For each opponent the textbook analyzes their motivations and common methods of attack. Analysis of opponents also takes a wider societal view of security, like the representation issue in security engineering and how that fails people suffering from IPV, or viewing online radicalization under the lens of a cyberattack. I will try to look more into the case studies that Anderson brings up to give more context.</p>
+
+<p>NSA please don’t get mad at me :) To be honest, the biggest takeaway from this chapter is that the government is pulling some crazy shit.</p>
+
+<h2 id="spies">Spies</h2>
+
+<h3 id="the-five-eyes">The Five Eyes</h3>
+
+<p>The Five Eyes countries are USA, UK, Canada, Australia, and New Zealand. Their capabilities are mostly known through the Edward Snowden leaks, with the section going through many of the technologies described in the leaks.</p>
+
+<p>The first of these is <em>Prism</em>. The NSA had a tap on internal systems of big tech companies like Google, Facebook, and Yahoo as long as the target of the surveillance was a foreigner.</p>
+
+<p><em>Tempora</em> is a UK-based fire-optic wiretapping program. So much data would be collected daily (21Pb from just Cornwall alone) that the feed undergoes “massive volume reduction” and the remaining material can be filtered with “selectors”. Data is kept for 30 days then deleted. Why UK? because fiber optic cables are laid along phone cables are laid along telegraph end stations, and England’s 19th ventury global empire literally set the foundations for a world-wide intelligence asset.</p>
+
+<p><em>Muscular</em> is an application running on Tempora. It takes advantage of the fact that big companies don’t encrypt communications within their perimeter. Agencies could pick up the data from between the internal data centers that’s in the clear. Even though companies learned from this and adopted more zero trust architecture, there might still be issues from how CDNs don’t encrypt data flowing in (o.e. backhaul traffic) thus making it vulnerable to parties who can read the traffic directly from the wires.</p>
+
+<p><em>Special Collection Service</em> or SCS deals in foreign intelligence collection, such as cell data antennas in embassies, bugs, moles in target organizations, collecting EM emissions (<em>Tempest</em> monitoring)
+Part of SCS monitoring involves tampering of the supply-chain, such as implants in routers. Bullrun or Edgehill is the program all about supply-chain tampering, from misdirecting academic research to influencing NIST standards so certain cryptographic technologies or key lengths are used, making those systems intentionally vulnerable. The Dual_EC-DRBG random number generator had an NSA backdoor, for example. Though it did not see widespread adoption, it was used in the RSA BSAFE library that many companies used.</p>
+
+<p>To search the data, analysts use <em>Xkeyscore</em>. As a federated system, one query scans all sites, including some that might be hacked systems set up to exfiltrate data with a certain query. A notifier called Trafficthief tips off analysts when targets do anything of interest, Mugshot crawls and fingerprints machines for analysts to target, and fingerprints can also be built for a target’s online activity. A case study can be made of Gemalto, which was hacked by using Xkeyscore to identify sysadmines to spearphish, compromising billing servers, and harvesting keys in transit to mobile SPs “by email or FTP with simple encryption methods that can be broken … or occasionally with no encryption at all.” To quote this [Forhes article][https://www.forbes.com/sites/thomasbrewster/2015/02/20/telecoms-industry-compromised-by-gchq-and-nsa/], “These keys encrypt calls, texts and internet usage between the mobile user and their telecoms provider. By stealing them, GCHQ could harvest communications data, as the agency is known to do, and unlock the content of the messages any time they wanted.”</p>
+
+<p>To defeat VPNs, a decryption service called <em>Longhaul</em> breaks the ciphertext using cutting-edge cryptanalytic techniques. For example, some variant of the “Logjam attack” might be possible against 1024-bit Diffie-Hellman key exchanged used by many VPNs and TLS, especially since many people use the same primes.</p>
+
+<p><em>Quantum</em> attacks communication in real time by injecting a malicious packet somehow exploiting the browser to get in the way of the encrypted tunnel. This and other hacking techniques fall under <em>Computer and Network Exploitation</em> (CNE). Thanks to a number of disclosures both by official sources as well as whistleblowers and hackers, there are many tools documented for the public, sometimes even used by law enforcement to catch criminals.</p>
+
+<h3 id="the-analysts-viewpoint--offensive-operations">The analyst’s viewpoint &amp; Offensive Operations</h3>
+
+<p>An analyst will basically use Xkeyscore like Google to find their target. Once they have, Xkeyscore gives data on which websites they visit, their locations, install into their devices, look into the people they know through contact historu, etc. On the offensive side, cyberweapons came into the conversation after Stuxnet allegedly caused an explosion in Iran’s Natanz Nuclear Facility.</p>
+
+<h3 id="attack-scaling">Attack scaling</h3>
+
+<p>Anderson makes some interesting points here. It takes a lot of effort to wiretapp a single person. However, it takes a lot of initial cost to tap everyone, but each additional tap goes way down. “The Five Eyes strategy is essentially to collect everything in the world; it might cost billions to establish and maintain the infrastructure, but once it’s there you have everything.” This is true from both a surveillance and offensive standpoint.</p>
+

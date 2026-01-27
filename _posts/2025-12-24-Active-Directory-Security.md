@@ -22,4 +22,4 @@ Make sure users only have the rights and privileges they need. Otherwise they ca
 
 ![Bloodhound Example](/assets/img/bh_gpo.png)
 
-We can identify possible attack paths using [Bloodhound] (https://bloodhound.specterops.io/get-started/introduction) as shown below. Here, **Domain Users** can modify **Disconnect Idle RDP** GPO because they are part of **Authenticated Users**.
+We can identify possible attack paths using [Bloodhound](https://bloodhound.specterops.io/get-started/introduction) as shown below. Here, **Domain Users** can modify **Disconnect Idle RDP** GPO because they are part of **Authenticated Users**.
