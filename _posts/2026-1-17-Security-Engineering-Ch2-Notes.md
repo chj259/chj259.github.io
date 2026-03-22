@@ -77,6 +77,6 @@ Geeks similarly reveal vulnerabilities often with the goal of common good and ca
 
 ## Other
 
-Some interesting insights: online mobs can be considered a form of hacktivism that are hard to regulate due to the ambiguity of context, and many systems fail when the threat actor is an intimate partner. This oversight seems to be due to security engineering's proclivity towards a certain demographic that overlooks htis kind of abuse, highlighting the importance of diverse perspectives in security.
+Some interesting insights: online mobs can be considered a form of hacktivism that are hard to regulate due to the ambiguity of context, and many systems fail when the threat actor is an intimate partner. This oversight seems to be due to security engineering's proclivity towards a certain demographic that overlooks this kind of abuse, highlighting the importance of diverse perspectives in security.
 
 
