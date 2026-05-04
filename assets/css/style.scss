@@ -3,8 +3,12 @@
 
 @import "{{ site.theme }}";
 
+*{
+  color: DarkCyan;
+}
+
 #container, body {
- background: GhostWhite
+ background: Ivory;
 }
 
 hr {
@@ -33,22 +37,26 @@ header {
 
 .left, 
 .right {
-  display:inline-block  
+  display:inline-block;  
 }
 
 .left {
   flex: 1;
 }
+
+.right {
+  text-align: right;
+}
+
 h1 {
   font-family: 'Montserrat', Helvetica, serif;
-  color: #000000;
   font-weight: bold;
 }
 h2 {
   margin-top: 4px;
   margin-bottom: 8px;
   font-size: 24px;
-  color: #000000;
+  color: CadetBlue;
 }
 footer {
   padding-top: 20px;
@@ -83,6 +91,10 @@ ul > li::marker {
   font-size: 1em;
 }
 
+a {
+  color: IndianRed;
+}
+
 b, strong {
-   color: firebrick;
+   color: IndianRed;
 }
