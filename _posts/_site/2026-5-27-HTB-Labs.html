@@ -1,0 +1,5 @@
+<p>** Oopsie</p>
+
+<p>For this one, I first had to upload a reverse shell, then login as another user. I learned that reverse shells have this annoying issue where the <strong>su</strong> command can’t be run, because it requires a real terminal. I found this <a href="https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/">very good blog</a> explaining what’s going on and how to spawn fully interactive shells. To solve this challenge, I used the pty method the author discusses in the first section. They note that pty still gets closed by ctrl-c, there’s no tab-complete and no history, so while it is easy it has its downsides.</p>
+
+<p>Method 2 is socat, “netcat on steroids”. The author even gives a method in case socat is not installed by wgetting a certain github repo. Method 3 fucks around with the stty options to somehow upgrade to a full shell.</p>

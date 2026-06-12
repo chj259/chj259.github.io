@@ -1,0 +1,115 @@
+<p>This chapter is all about cryptography. Anderson first makes an argument for why cryptography is important for the security engineer: it’s an important aspect of most security protocols and engineers should understand its mechanisms in order to properly design around them. He defines three “levels” of crypto. The first is the basic explanations of how they work/overall logic. The second is the mathematical proof. The third is the engineering implementation.</p>
+
+<h2 id="history">History</h2>
+
+<p>Stream ciphers stem from the Vigenere cipher, which uses an infinitely repeating key to encrypt each letter. However, the repetition allows for information to be gleaned from long ciphertexts. To solve this, we remove the repetition in the one-time pad: keys are the same length as the ciphertext and there are as many keys as ciphertexts. We also want to ensure that keys are impossible to reconstruct.</p>
+
+<p>Block ciphers stem from the Playfair cipher. This takes digraphs and maps them to unique ciphertexts, which makes them stronger than stream ciphers on singular characters. However, changing a single letter in the digraph corresonds to a single letter change in the ciphertext, which can eventually allow for information to be gleaned. The goal is to change <em>half the output bits</em> per one input bit changed. The strength can also be improved by increasing the block size, which is what modern block ciphers do. Finally, block ciphers should resist replay attacks (e.g. cutting and pasting together messages to form a bad and valid ciphertext) and they can do this by somehow binding the blocks together.</p>
+
+<p>Generally, modern systems use block ciphers since they are more flexible, but hardware uses stream ciphers since they reduce the number of gates/processing necessary.</p>
+
+<p>One-way functions are not meant to be be reversed. Instead of confidentiality they provide authentication. Each hash should uniquely correspond to each plaintext.</p>
+
+<h2 id="security-models">Security Models</h2>
+
+<p>Continuing in our explanation of the first level of cryptography, we discuss four popular security models to formalize whether a cipher is “good” or not.</p>
+
+<p><strong>Perfect secrecy</strong> states that given any ciphertext or authentication key, any possible plaintext/forgery of that length is equally likely. On the other hand, <strong>indistinguishability</strong> takes a more general stance, that an attacker cannot guess any information about the plaintext that it shouldn’t with non-negligible probability. <strong>Semantic security</strong> takes this to the next level by saying that even if the attacker knows all but one bit of the plaintext, they should not be able to glean any more information than that. To capture security from a runtime perspective, we have <strong>concrete security</strong>, which says that a system is (t,e)-secure if an adversary uses t seconds to break the cipher with probability e.</p>
+
+<p><strong>Random oracles</strong> are a very specific niche of models typically used to abstract away cryptographic hashes–they are the ideal hash function. Basically, they are an elf holding a scroll and a dice in a box. When plaintext is input into the box, the elf checks whether the plaintext has a corresponding value in the scroll. If not, it rolls the dice and records the plaintext-value pair on the scroll. The next couple cryptography concepts are all based on the random oracle.</p>
+
+<h3 id="random-oracle-1-hash-function">Random Oracle 1: Hash Function</h3>
+
+<p>Hash functions are firstly one-way. To formalize, an n-bit hash should not be guessable with less than expected \(2^{n-1}\) guesses. Hash functions are secondly very independent from plaintext. A small change in plaintext must significantly change the ciphertext in order to ensure authenticity. Hash functions are thirdly collision-resistant. It’s expected that an n-bit hash which has \(2^n\) possibilities will find a match in \(2^{n/2}\) hashes (by birthday theorem). Depending on circumstance a collision is potentially catastrophic. During challenge-response authentication it’s ok since we want a specific hash, but hashes that encode meaning might be dangerous. The example we use is if the mafia can get you to sign an M1
+saying “I hereby order a copy of Rubber Fetish volume 7 for $32.95” and then present the signature together with an M2 “I hereby mortgage my house for $75,000 and please send the funds to Mafia Holdings Inc., Bermuda.”</p>
+
+<h3 id="random-oracle-2-stream-cipher">Random Oracle 2: Stream Cipher</h3>
+
+<p>Basically, take a really big random oracle and put a key into it and now you have a key generator. Now we have our one-time-pad. However, practical concerns often force people to make it into a “two”-time-pad and reuse keys. To ensure that evesdroppers can’t derive information due to repeated key use, you can use an <strong>initialization vector (IV)</strong> to start your keystream at a different place and address the redundancy issue, but now you would need to communicate the IV and ensure that doesn’t get tampered with.</p>
+
+<h3 id="random-oracle-3-block-cipher">Random Oracle 3: Block Cipher</h3>
+
+<p>Similar to a stream cipher, but instead of a stream of bits to make a key the elf in the box does permutations and encrypts/decrypts the text for you. Each key corresponds to a unique set of permutations independent from all other keys. No information can be gained without the key and no information can be gleaned about plaintexts/ciphertexts that haven’t been created yet.</p>
+
+<h3 id="random-oracle-4-public-key-crypto-and-signatures">Random Oracle 4: Public Key Crypto and Signatures</h3>
+
+<p>We have a public key for encryption by anybody and a private key so that only the recipient can decipher the message. Along with this added complexity, however, we would need to replicate the oracle across both ends of the communications, which can be done by implementing some neat mathematics. We also tend to randomize public key encryption so that the output is different even if you use the same pubkey and plaintext, which is done so attackers can’t gain more information about whether a plaintext guess is correct for a given ciphertext. If we tweak the recipient mechanism, we can create a <strong>digital signature</strong>. The idea is that only one person can make the signature, but anyone can check whether the signature is valid. And so, the person uses their private signing key to create the digital signature, and a verification function uses the public verification key to output whether it is correct or not. Since the textbook does not explain it that well, here is the explanation from geeksforgeeks. First, a hash is created of the original message. Then, the hash is encrypted with the private key. Finally, the hash is decrypted with the public key and checked to ensure that it matches the hash computed by the recipient. There is also the idea of message recovery? You can look up the original message given the signature or create and store the message elf and scroll-style.</p>
+
+<h2 id="symmetric-crypto-algorithms">Symmetric crypto algorithms</h2>
+
+<h3 id="sp-networks">SP-networks</h3>
+
+<p>First, we have symmetric block ciphers which use substitution and permutation. Substitution is for adding a key that confuses the value of the plaintext symbol, while permutation diffuses the plaintext throughout the ciphertext. <strong>SP-networks</strong> are the earliest example of these circuits. They are made up of <strong>S-boxes</strong>, which scramble around the bits of the plaintext in some secret way determined by our elf lookup table. Note that the size of input to the S-box exponentially determines how much memory it will use, and for that reason we want to make the S-boxes individually smaller but put a bunch of them together (e.g. four 4-bit S-boxes instead of a single 16-bit S-box).</p>
+
+<p>The SP-network needs:</p>
+<ol>
+  <li>Correct block size large enough to deal with birthday theorem</li>
+  <li>Enough rounds to guard against chosen plaintext attacks; note that this depends on how diffuse the cipher is, usually scrambles based on more bits vs just one-to-one are more diffuse</li>
+  <li>S-boxes resistant to linear cryptanalysis and differential cryptanalysis</li>
+</ol>
+
+<h3 id="aes">AES</h3>
+
+<p>This is the most common modern block cipher. It is an SP-network that uses one S-box on the entire block (sub-bytes step), then shifts rows and mixes columns. This allows changes in a single bit to propagate quickly, going back to the concept of diffusion. The theoretical attacks only provide a slight advantage over brute-force and are practically infeasible.</p>
+
+<p>AES was chosen through a government competition, with other finalists being Twofish and Serpent(which Anderson worked on). AES was the mathematically weakest o the 5 finalists, but was chosen for its speed.</p>
+
+<p>AES’ only weakness are in implementation. Power and timing attacks are side-channels that are commonly used, as are errors that come from using multiple ciphers in tandem(pluggable cryptography). That aside, AES has been around for so long that implementations are well-known. As a fun conspiracy theory, Anderson talks about speculation that NSA chose AES, which is clearly less secure, so that other nation-states would implement other ciphers that are not as well-supported.</p>
+
+<h3 id="feistel-ciphers">Feistel ciphers</h3>
+
+<p>This is a confusing one. So, to start, they are a completely different thing than SP-networks. You split the input in half, run a function on the left half, then XOR it to the right half. Take this “enciphered” right half, run it through ANOTHER function, and XOR that result to your left half. Do this a couple times with unique functions each time. The end result is the new left and right half. Then, switch sides. Do this a couple times to get your ciphertext. The point of the whole design is that you can run the exact same structure, just reversing the order of the functions, to decrypt the ciphertext. This allows for one-way functions to be used as round functions, which makes for less constraints on not just security but also code size, speed and hardware. This structure has been proven to be pseudorandom.</p>
+
+<h3 id="des">DES</h3>
+
+<p>DES is a Feistel cipher, with round functions using mixing and S-boxes. Immediately, people criticised its keys for being way too short. Currently DES and its successor 3DES are both completely broken. I think 3DES, where you encrypt with k1, decrypt with k2, and encrypt with k3, is pretty cool because this makes it backwards compatible with DES. Another technique is DESX, where you XOR k1 to the plaintext, run DES with k2, and XOR the output with k3. This process is called <strong>whitening</strong>. AESX also uses this same whitening concept to make each round of encryption unique.</p>
+
+<h3 id="modes-of-operation">Modes of Operation</h3>
+<p>NEVER use ECB. This is where you don’t do anything when you chain the blocks of your ciphertext together. This leads to a lot of information being revealed (especially when you use the same exact data patterns, it’s apparent in the ciphertext that those blocks are identical). For example, you could usually tell what a block on null data looked like, so you would be able to reverse engineer ciphertext by combining a nullblock with each password, then separating the ciphertext by the known null. Now you know what those passwords look like while encrypted. Furthermore, the lack of chaining allows an attacker to splice the ciphertexts by block, enabling attackers to create valid wrong messages. Thus, there is an integrity problem. Furthermore, attackers might be able to use error messages to note when something goes wrong (e.g. incorrect padding errors).</p>
+
+<p>Cipher block chaining rectifies the mistakes of ECB by XORing the previous block of ciphertext to the current plaintext block BEFORE encryption. Sadly, this doesn’t protect integrity and still needs to watch out for errors giving away information. There are also issues of runtime. Because you need the previous block to encrypt the next block, this is not parallelizable.</p>
+
+<p>To make it parallelizable, instead of XORing the previous block we XOR a certain key from a keystream. But this STILL doesn’t solve integrity issues, since the ciphertext blocks are highly structured and still allow for valid wrong messages. Some examples of stream-cipher modes of operation: OFB repeatedly encrypts an initialization vector. Eventually, though, the keystream will loop back and encrypt itself into the IV. The expected cycle length is 2^n/2 by Birthday theorem. Note that the expected cycle length for a traditional keystream would be 2^n. We also have CFB, which is rarer and designed for lossy radio systems. To protect against jamming, CFB is self-synchronizing by adding the last output bit to the next plaintext bit. Note that this recduces our block size by one and reveals information about your message. This is why nowadays we usually separate synchronization/error correction and encryption.</p>
+
+<h3 id="mac-and-integrity">MAC and Integrity</h3>
+
+<p>This addresses the integrity problem and only the integrity problem. We basically run a CBC and give over the last ciphertext block. Remember that CBC has splicing problems, so we get rid of those previous blocks. It is mathematically proved that an attack on a MAC is equivalent to an attack on the underlying block cipher.</p>
+
+<p>But now we run into the same parallelization problem. This leads us to the modern approach: <strong>Galois Counter Mode</strong>. Conceptually, we combine counter mode with authentication. Here our “hash” turns the ciphertext into the coefficient of a polynomial, which is used to get a value from a Galois field. This is our authenticator tag and acts as the “MAC”. GCM is parallelizable and is the go-to mode for high-traffic environments.</p>
+
+<p>Now we have a new problem: we’ve changed the length of our plaintext by adding the authentication tag. This becomes a problem for operations that need plaintext length to be preserved, such as hard disk encryption. XTS tries to build authentication into ciphertext by whitening each block by a unique value that follows a sequence. If an attacker tries to swap blocks, the whiteners which are called “tweak keys”, will go out of order and we know there’s been an issue. I don’t think this solves the highly-structured problem though? But for a rudimentary check it’s better than nothing.</p>
+
+<h3 id="hash-functions">Hash Functions</h3>
+
+<p>So, how do hashes work? Anderson mentions a method for creating hash functions from block ciphers. Run the plaintext one block at a time through the cipher, then XOR the current cipher block with your hash value from all those previous blocks. Basically, pile all the cipher blocks on top of each other and XOR everything into one hash. There are other hash functions, though. As long as they fulfill the properties we outlined in the theoretical section, they’re suitable.</p>
+
+<p><strong>Merkle Trees</strong> hash a large input quickly. The inputs become leaves. Each child gets hashed and combined at the parent node and hashed again. The process repeats for all parents until you get the final hash at the root.</p>
+
+<p>How about using hashes as keys? You could make the Merkle tree into the public key/verification key of a digital signature. You can also limit the damage if one key gets revealed by doing <strong>key updating</strong>. If you replace the key with its hash at regular intervals, an attacker will not be able to decrypt previous messages (<strong>backward security</strong>). If you make the hash include all previous messages in the conversation, you can lock the attacker out of future messages as well(<strong>forward security</strong>).</p>
+
+<p>Onto the issue: hash collisions. MD4, MD5, and SHA1 are all insecure in the modern day because collisions can be found easily. But how big of a problem is this, really? Ideally, you notice that message A is being sent, swap it out with message B with the same hash value, and now you’ve hacked the system. In real life, correspondents don’t even use hashes as authenication, instead opting for MACs. Secondly, if both correspondents keep transaction logs, they’ll notice that what was recieved doesn’t line up with what was sent. And most damningly, it’s a lot harder to find a collision with a specific element than a collision between any two hashes, which is the entire point of the birthday paradox.</p>
+
+<p>Anderson argues that the importance of a hash collision is not engineering, but <em>certificational</em>. He cites an example case of a judge who acquits a clearly guilty motorist because the judge can’t find an expert to testify that the hash used on the photograph was “secure”.</p>
+
+<h2 id="asymmetric-crypto-algorithms">Asymmetric Crypto Algorithms</h2>
+
+<p>Firstly, we have prime number-based ciphers. The difficulty lies in attempting to prime-factorize the product of two large primes. The primary factoring-based algorithm is RSA. Plaintext M is encrypted by taking it to some secret power e and modded to N. N is the product of our two big primes p and q and e is a number that has no common factors with \(\Phi(N)\).</p>
+
+\[C \equiv M^e \bmod N\]
+
+<p>The rationale behind e is that if it is relatively prime to \(\Phi(N)\), there exists a d such that \(ed \equiv 1 \bmod (\Phi(N))\). Thus, we get:</p>
+
+<p>\(C^d \equiv M^{ed} \equiv M^{1+k\Phi(N)} \equiv M*M^{\Phi(N)} \equiv M \bmod N\). Keep d secret and publish C, e, and N. If we want to use RSA for digital signature, encrypt with d, and anyone can verify your identity by decrypting with e and making sure M is correct.</p>
+
+<p>RSA is actually quite fragile. To explain why, we first define <strong>homomorphisms</strong>, “a function that preserves some mathematical structure”. For example, \(C_1*C_2=C_3\). This means that \(C_3\) is not completely random. It will break if you encrypt the same ciphertext under many different keys, a too-short message, if two messages are related by a polynomial, etc. Also, the process being deterministic might cause replay attacks or patterns to become issues, but this can be fixed with some randomized nonces. The goal should be that every time we encrypt the same short message, we get a completely different ciphertext that is indistinguishable from others with the same AND different message.</p>
+
+<p>To go into more detail on this randomized nonce structure, the usual approach is <strong>optimal asymmetric encryption padding</strong> (OAEP) which hashes the message with a nonce in a Feistel cipher. The name comes from how this method pads out the message with the nonce, then sends the combined result to the recipient. The recipient recovers N through some XOR logic and uses that to recover M.</p>
+
+<p>As for digital signatures, usually we can address issues of message length, patterns, etc. by just hashing the message before signing it. We can also include a timestamp to account for replay attacks.</p>
+
+<p>With those math weaknesses out of the way, most attacks get at implementation errors. Read: side channel attacks that target power and timing analyses. Attacks can observe error messages, for example. There are also times when the machines fail, resulting in errors in computation. You can stack overflow the code, or even send in malicious code as keys or padding. Maybe those errors are intentional, such as a chipmaker interfering with the device.</p>
+
+<p>The second kind of asymmetrical cipher uses discrete logarithms, which are the mathematics related to \(b^x \equiv a \bmod n\). This includes elliptic curves. Discrete logarithm algorithms are now the most popular kind of cryptography. Here the one-way function is finding the exponent x for which \(y \equiv g^x \bmod p\).</p>
+
+<p>Here is the high-level design: we have Alice and Bob who put a message in a box and want to send the message safely without Eve opening the box. Alice puts a lock, sends to Bob, who also puts a lock. Alice gets the two-lock box, removes her own lock, then sends to Bob. Bob removes his own lock and successfully gets the message. A discrete logarithm cipher substitutes locks for taking the message to the power of x, then mod p.</p>
+
